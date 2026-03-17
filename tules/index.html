@@ -11,8 +11,8 @@
 
 <script>
 if (
-  window.matchMedia('(display-mode: standalone)').matches ||
-  window.navigator.standalone === true
+  window.matchMedia('(display-mode: standalone)').matches &&
+  /Android/i.test(navigator.userAgent)
 ) {
   document.documentElement.classList.add('pwa');
 }
@@ -239,9 +239,9 @@ if ('serviceWorker' in navigator) {
 const MIN_SPLASH_TIME = 1000;
 const startTime = Date.now();
 
-function isPWA() {
+function isAndroidPWA() {
   return window.matchMedia('(display-mode: standalone)').matches
-      || window.navigator.standalone === true;
+    && /Android/i.test(navigator.userAgent);
 }
 
 function hideSplashSmoothly() {
@@ -261,10 +261,10 @@ window.addEventListener("load", () => {
   const splash = document.getElementById("splash");
 
   // If PWA → skip custom splash completely
-  if (isPWA()) {
-    splash.remove();
-    return;
-  }
+  if (isAndroidPWA()) {
+  splash.remove();
+  return;
+}
 
   const elapsed = Date.now() - startTime;
   const remaining = Math.max(0, MIN_SPLASH_TIME - elapsed);
