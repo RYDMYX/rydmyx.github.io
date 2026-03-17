@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+  <title>tules - bundled music tools</title>
+<link rel="manifest" href="/tules/manifest.json">
+
+<script>
+if (
+  window.matchMedia('(display-mode: standalone)').matches ||
+  window.navigator.standalone === true
+) {
+  document.documentElement.classList.add('pwa');
+}
+</script>
+
+ <style>
+
+  html {
+    font-size: clamp(5px, 1vmax, 18px);
+  }
+
+#splash{
+  position:fixed;
+  inset:0;
+  background:black;
+  color:white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:3rem;
+  z-index:2147483647;
+}
+
+/* Hide splash completely in installed PWA */
+.pwa #splash{
+  display:none;
+}
+
+#splash img{
+  width:80dvw;
+  height:auto;
+}
+
+#splash{
+  transition: opacity 0.3s ease;
+}
+
+
+  .fs-btn {
+    position: fixed;
+    top: 8px;
+    right: 8px;
+    z-index: 9999;
+
+    font-size: 2rem;   /* change from 14px */
+    padding: 0.4em 0.7em;
+
+    border-radius: 0.4em;
+    border: 1px solid #444;
+    background: #111;
+    color: #fff;
+    opacity: 0.85;
+  }
+
+  .fs-btn:active {
+    opacity: 1;
+  }
+  svg { display:block; }
+#top {
+  position: relative;
+  margin:0% auto;
+  display: flex;
+  flex-direction: row;         /* horizontal layout */
+  align-items: center;     /* top-aligned */
+  justify-content: center;     /* optional: center the whole row */
+  width: 100%;
+  padding: 0.5rem;
+  box-sizing: border-box;
+  aspect-ratio: 3/1;
+  overflow: hidden;
+}
+
+  @media (orientation: portrait) {
+    #top {
+      width: 100%;
+      height: auto;
+    }
+  }
+  @media (orientation: landscape) {
+    #top {
+      width: auto;
+      height: 40%;
+    }
+  }
+
+#left-column, #center-column, #right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0rem;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  margin: auto 0%;
+}
+
+#center-column {
+  width: 40%;
+  height: 100%;
+}
+#left-column, #right-column {
+  width: 30%;
+  height: 100%;
+}
+</style>
+</head>
+<body>
+<div id="splash">
+  <img src="/tules/logo.png">
+</div>
+
+
+
+
+  <!-- Fullscreen controls -->
+  <button id="fullscreenBtn" class="fs-btn" hidden>
+    ⛶
+  </button>
+  
+
+  <button id="exitFullscreenBtn" class="fs-btn" hidden>
+    ✕
+  </button>
+  <div id="top">
+    <div id="left-column"></div>
+    <div id="center-column"></div>
+    <div id="right-column"></div>
+  </div>
+  <!-- Your existing scripts -->
+  
+  <script src="key.js"></script>
+  <script src="piano.js"></script>
+  <script src="pianoui.js"></script>
+  <script src="ruler.js"></script>
+  <script src="audio.js"></script>
+  <script src="oscillator.js"></script>
+  <script src="samples.js"></script>
+  <script>
+audioEngine.setSource("samples");
+</script>
+  <script src="keyboard.js"></script>
+  
+   <script src="circle.js"></script>
+  <script src="scale.js"></script>
+  <script src="staff.js"></script>
+<!-- <script src="buttons.js"></script> -->
+ <script src="screen.js"></script>
+ <script src="sruler.js"></script>
+
+
+  <!-- Fullscreen + orientation logic -->
+  <script>
+    const fsBtn = document.getElementById('fullscreenBtn');
+    const exitBtn = document.getElementById('exitFullscreenBtn');
+
+    function isMobilePortrait() {
+      return window.innerWidth < window.innerHeight;
+    }
+
+    async function enterFullscreen() {
+      if (document.documentElement.requestFullscreen) {
+        await document.documentElement.requestFullscreen();
+      }
+
+      if (screen.orientation?.lock) {
+        try {
+          await screen.orientation.lock('landscape');
+        } catch {
+          // silently ignore (iOS etc.)
+        }
+      }
+    }
+
+    async function exitFullscreen() {
+      if (document.exitFullscreen) {
+        await document.exitFullscreen();
+      }
+    }
+
+    function updateButtons() {
+      const isFS = !!document.fullscreenElement;
+
+      // Show fullscreen button only on mobile portrait & not fullscreen
+      fsBtn.hidden = isFS || !isMobilePortrait();
+
+      // Show exit button only while fullscreen
+      exitBtn.hidden = !isFS;
+    }
+
+    fsBtn.addEventListener('click', enterFullscreen);
+    exitBtn.addEventListener('click', exitFullscreen);
+
+    document.addEventListener('fullscreenchange', updateButtons);
+    window.addEventListener('resize', updateButtons);
+
+    updateButtons();
+  </script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/tules/service-worker.js')
+      .then(reg => console.log('SW registered', reg.scope))
+      .catch(err => console.error('SW failed', err));
+  });
+}
+</script>
+
+<script>
+
+const MIN_SPLASH_TIME = 1000;
+const startTime = Date.now();
+
+function isPWA() {
+  return window.matchMedia('(display-mode: standalone)').matches
+      || window.navigator.standalone === true;
+}
+
+window.addEventListener("load", () => {
+
+  const splash = document.getElementById("splash");
+
+  // If running as installed PWA → remove splash immediately
+  if (isPWA()) {
+    splash.remove();
+    return;
+  }
+
+  // Otherwise (browser) keep splash for minimum time
+  const elapsed = Date.now() - startTime;
+  const remaining = Math.max(0, MIN_SPLASH_TIME - elapsed);
+
+  setTimeout(() => {
+    requestAnimationFrame(()=>{
+  requestAnimationFrame(()=>{
+    splash.style.opacity="0";
+    setTimeout(()=>splash.remove(),450);
+  });
+});
+  }, remaining);
+
+});
+
+</script>
+
+</body>
+</html>
