@@ -11,7 +11,6 @@ html, body { height: 100%; margin: 0; padding: 0; overflow-x: hidden; box-sizing
   height: 60%;
   display: flex;
    flex-direction: column;
-background: black;
 }
 
  @media (orientation: portrait) {
