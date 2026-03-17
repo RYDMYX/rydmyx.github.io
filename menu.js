@@ -3,8 +3,8 @@ const style = document.createElement("style");
 style.textContent = `
 #menuBtn {
   position: fixed;
-  top: 5px;
-  left: 5px;
+  top: 10px;
+  left: 10px;
   font-size: 24px;
   cursor: pointer;
   z-index: 1000;
@@ -12,8 +12,8 @@ style.textContent = `
 
 #menu {
   position: fixed;
-  top: 50px;
-  left: 15px;
+  top: 10px;
+  left: 10px;
   background: white;
   border: 1px solid #ccc;
   display: none;
