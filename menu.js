@@ -13,7 +13,7 @@ style.textContent = `
 #menu {
   position: fixed;
   top: 50px;
-  right: 15px;
+  left: 15px;
   background: white;
   border: 1px solid #ccc;
   display: none;
