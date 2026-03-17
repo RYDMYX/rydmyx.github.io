@@ -3,7 +3,7 @@ const style = document.createElement("style");
 style.textContent = `
 #menuBtn {
   position: fixed;
-  top: 10px;
+  top: 1px;
   left: 10px;
   font-size: 24px;
   cursor: pointer;
@@ -12,7 +12,7 @@ style.textContent = `
 
 #menu {
   position: fixed;
-  top: 10px;
+  top: 1px;
   left: 10px;
   background: white;
   border: 1px solid #ccc;
