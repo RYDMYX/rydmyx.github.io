@@ -62,10 +62,30 @@ input[type="range"] {
   background: orange;
   color: black;
 }
+
+#splash {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #111;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  font-size: 18px;
+}
+
 </style>
 </head>
 
 <body>
+
+<div id="splash">
+  Loading audio...
+</div>
 
 <h2>🎚 Mixer</h2>
 
@@ -222,6 +242,11 @@ function setVolume(index, value) {
   trackStates[index].volume = parseFloat(value);
   updateGains();
 }
+
+Tone.loaded().then(() => {
+  const splash = document.getElementById("splash");
+  if (splash) splash.remove();
+});
 
 </script>
 
