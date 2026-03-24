@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StekoTune – Clean Mixer</title>
+
+<script src="https://unpkg.com/tone"></script>
+
+<style>
+body {
+  font-family: Arial;
+  background: #111;
+  color: white;
+  padding: 20px;
+}
+
+.transport {
+  background: #1a1a1a;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+button {
+  padding: 6px 10px;
+  margin-right: 6px;
+  background: #222;
+  color: white;
+  border: none;
+  border-radius: 6px;
+}
+
+input[type="range"] {
+  width: 100%;
+}
+
+.track {
+  margin-bottom: 12px;
+  padding: 10px;
+  background: #1a1a1a;
+  border-radius: 8px;
+}
+
+.track-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.track-name {
+  width: 70px;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.track-row input[type="range"] {
+  width: 150px;
+}
+
+.active {
+  background: orange;
+  color: black;
+}
+</style>
+</head>
+
+<body>
+
+<h2>🎚 Mixer</h2>
+
+<div class="transport">
+  <button onclick="playAll()">▶️</button>
+  <button onclick="pauseAll()">⏸️</button>
+  <button onclick="stopAll()">⏹️</button>
+
+  <input type="range" id="seekbar" min="0" max="1" step="0.001" value="0"
+         oninput="seek(this.value)">
+</div>
+
+<div id="tracks"></div>
+
+<script>
+
+const trackFiles = [
+  { name: "Soprano", file: "soprano.mp3" },
+  { name: "Alto", file: "alto.mp3" },
+  { name: "Tenor", file: "tenor.mp3" },
+  { name: "Bass", file: "bass.mp3" }
+];
+
+const players = [];
+const gains = [];
+const trackStates = [];
+
+let isPlaying = false;
+let soloIndex = null;
+let duration = 0;
+
+const container = document.getElementById("tracks");
+const seekbar = document.getElementById("seekbar");
+
+// CREATE TRACKS
+trackFiles.forEach((track, index) => {
+
+  trackStates[index] = {
+    volume: 1,
+    muted: false
+  };
+
+  const div = document.createElement("div");
+  div.className = "track";
+
+  div.innerHTML = `
+    <div class="track-row">
+      <div class="track-name">${track.name}</div>
+      <button onclick="toggleSolo(${index}, this)">S</button>
+      <button onclick="toggleMute(${index}, this)">M</button>
+      <input type="range" min="0" max="1" step="0.01" value="1"
+             oninput="setVolume(${index}, this.value)">
+    </div>
+  `;
+
+  container.appendChild(div);
+
+  const gain = new Tone.Gain(1).toDestination();
+
+  const player = new Tone.Player(track.file, () => {
+    if (!duration && player.buffer) {
+      duration = player.buffer.duration;
+    }
+  }).connect(gain);
+
+  player.sync().start(0);
+
+  players.push(player);
+  gains.push(gain);
+});
+
+// PLAY
+async function playAll() {
+  await Tone.start();
+  if (!isPlaying) {
+    Tone.Transport.start();
+    isPlaying = true;
+  }
+}
+
+// PAUSE
+function pauseAll() {
+  Tone.Transport.pause();
+  isPlaying = false;
+}
+
+// STOP
+function stopAll() {
+  Tone.Transport.stop();
+  Tone.Transport.seconds = 0;
+  seekbar.value = 0;
+  isPlaying = false;
+}
+
+// SEEK
+function seek(value) {
+  if (!duration) return;
+  Tone.Transport.seconds = value * duration;
+}
+
+// AUTO SEEKBAR
+function updateSeekbar() {
+  if (duration) {
+    seekbar.value = Tone.Transport.seconds / duration;
+  }
+  requestAnimationFrame(updateSeekbar);
+}
+updateSeekbar();
+
+// 🔥 CENTRAL AUDIO LOGIC
+function updateGains() {
+  gains.forEach((g, i) => {
+
+    let vol = trackStates[i].volume;
+
+    if (trackStates[i].muted) vol = 0;
+
+    if (soloIndex !== null) {
+      vol = (i === soloIndex) ? vol : 0;
+    }
+
+    g.gain.value = vol;
+  });
+}
+
+// SOLO
+function toggleSolo(index, btn) {
+  if (soloIndex === index) {
+    soloIndex = null;
+    btn.classList.remove("active");
+  } else {
+    soloIndex = index;
+
+    document.querySelectorAll(".track-row button:first-of-type")
+      .forEach(b => b.classList.remove("active"));
+
+    btn.classList.add("active");
+  }
+
+  updateGains();
+}
+
+// MUTE
+function toggleMute(index, btn) {
+  trackStates[index].muted = !trackStates[index].muted;
+  btn.classList.toggle("active");
+
+  updateGains();
+}
+
+// VOLUME
+function setVolume(index, value) {
+  trackStates[index].volume = parseFloat(value);
+  updateGains();
+}
+
+</script>
+
+</body>
+</html>
