@@ -140,6 +140,7 @@ trackFiles.forEach((track, index) => {
 // PLAY
 async function playAll() {
   await Tone.start();
+await Tone.loaded();
   if (!isPlaying) {
     Tone.Transport.start();
     isPlaying = true;
