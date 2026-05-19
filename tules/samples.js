@@ -177,10 +177,10 @@ function play(note, velocity = 0.8){
   // envelope
   const attack = 0.005;
   const decay = 0.15;
-  const sustain = velocity * 0.7;
+  const sustain = velocity * 1.5;
 
   gain.gain.exponentialRampToValueAtTime(
-    Math.max(0.001, velocity),
+    Math.max(0.001, velocity * 2),
     now + attack
   );
 
@@ -215,7 +215,7 @@ function stop(note){
 
   obj.gain.gain.setValueAtTime(cur,t);
 
-  const release = 0.25;
+  const release = 2.5;
 
   obj.gain.gain.exponentialRampToValueAtTime(
     0.0001,
