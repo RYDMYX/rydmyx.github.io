@@ -11,7 +11,7 @@
   #measure-wrapper {
     position: relative;
     width: 100%;
-    height: 18%;
+    height: 14%;
     overflow: hidden;
     background: #fff;
     border-bottom: 0.01rem solid #bbb;
