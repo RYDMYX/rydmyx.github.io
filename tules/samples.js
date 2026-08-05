@@ -146,7 +146,10 @@ async function loadSamples(){
 
 function play(note, velocity = 0.8){
 
-  const root = noteToSample[note];
+  const originalNote = note;
+  const playedNote = window.transpose.apply(note);
+
+  const root = noteToSample[playedNote];
 
   if(!root) return;
 
@@ -162,8 +165,8 @@ function play(note, velocity = 0.8){
 
   source.buffer = buffer;
 
-  const targetFreq = audioEngine.noteFrequencies[note];
-  const rootFreq = audioEngine.noteFrequencies[root];
+const targetFreq = audioEngine.noteFrequencies[playedNote];
+const rootFreq = audioEngine.noteFrequencies[root];
 
   source.playbackRate.value = targetFreq / rootFreq;
 
@@ -191,11 +194,12 @@ function play(note, velocity = 0.8){
 
   source.start(now);
 
-  activeNotes.set(note,{
+activeNotes.set(originalNote,{
     source,
     gain,
-    panNode
-  });
+    panNode,
+    playedNote
+});
 
 }
 
