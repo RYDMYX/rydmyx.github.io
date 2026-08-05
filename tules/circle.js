@@ -60,6 +60,8 @@ wrapper.appendChild(svg);
 const wheelGroup = document.createElementNS("http://www.w3.org/2000/svg","g");
 svg.appendChild(wheelGroup);
 
+
+
 const cx = 400, cy = 400;
 const outerRadius = 360, innerRadius = 200;
 const step = (Math.PI*2)/12;
@@ -161,6 +163,18 @@ function computeDialIndex(){
   dialIndex=((fifthsCount%12)+12)%12;
 }
 
+const selector = document.createElementNS("http://www.w3.org/2000/svg", "path");
+
+const selectorStart = -Math.PI / 2 - step / 2;
+const selectorEnd = selectorStart + step;
+
+selector.setAttribute("d", createWedge(selectorStart, selectorEnd));
+selector.setAttribute("fill", "none");
+selector.setAttribute("stroke", "#000");
+selector.setAttribute("stroke-width", "16");
+selector.setAttribute("stroke-linejoin", "round");
+selector.setAttribute("pointer-events", "none");
+
 const outerCircle=document.createElementNS("http://www.w3.org/2000/svg","circle");
 outerCircle.setAttribute("cx",cx);
 outerCircle.setAttribute("cy",cy);
@@ -229,6 +243,9 @@ wheelGroup.appendChild(labelGroup);
 labelGroups.push(labelGroup);
 
 });
+
+// Place selector above the wheel but below the center button
+svg.appendChild(selector);
 
 const centerButton=document.createElementNS("http://www.w3.org/2000/svg","circle");
 centerButton.setAttribute("cx",cx);
