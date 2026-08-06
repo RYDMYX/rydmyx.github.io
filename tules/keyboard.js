@@ -63,6 +63,9 @@ function getExtendedMap(){
     "b": 7,
     "n": 9,
     "m": 11,
+    ",": 12,
+    ".": 14,
+    "/": 16,
 
     // Lower octave - Black keys
     "s": 1,
