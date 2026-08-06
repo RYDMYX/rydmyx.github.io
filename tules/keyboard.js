@@ -2,7 +2,7 @@
 (function(){
 
 // ---------- KEYBOARD LAYOUT ----------
-const keyboardLayout = "qwerty"; // "degree" or "qwerty"
+const keyboardLayout = "extended"; // "degree", "classic", "extended"
 
 // ---------- DEGREE LAYOUT ----------
 function getDegreeMap(){
@@ -23,8 +23,8 @@ function getDegreeMap(){
   };
 }
 
-// ---------- QWERTY LAYOUT ----------
-function getQwertyMap(){
+// ---------- CLASSIC LAYOUT ----------
+function getClassicMap(){
   return {
 
     // White keys
@@ -51,11 +51,67 @@ function getQwertyMap(){
   };
 }
 
+// ---------- EXTENDED (FL STUDIO) LAYOUT ----------
+function getExtendedMap(){
+  return {
+
+    // Lower octave - White keys
+    "z": 0,
+    "x": 2,
+    "c": 4,
+    "v": 5,
+    "b": 7,
+    "n": 9,
+    "m": 11,
+
+    // Lower octave - Black keys
+    "s": 1,
+    "d": 3,
+    "g": 6,
+    "h": 8,
+    "j": 10,
+
+    // Upper octave - White keys
+    "q": 12,
+    "w": 14,
+    "e": 16,
+    "r": 17,
+    "t": 19,
+    "y": 21,
+    "u": 23,
+    "i": 24,
+    "o": 26,
+    "p": 28,
+
+    // Upper octave - Black keys
+    "2": 13,
+    "3": 15,
+    "5": 18,
+    "6": 20,
+    "7": 22,
+    "9": 25,
+    "0": 27
+
+  };
+}
+
 // ---------- ACTIVE KEY MAP ----------
-const keyMap =
-  keyboardLayout === "qwerty"
-    ? getQwertyMap()
-    : getDegreeMap();
+let keyMap;
+
+switch(keyboardLayout){
+
+  case "classic":
+    keyMap = getClassicMap();
+    break;
+
+  case "extended":
+    keyMap = getExtendedMap();
+    break;
+
+  default:
+    keyMap = getDegreeMap();
+
+}
 
 // ---------- CHROMATIC NOTES ----------
 const notes = [
