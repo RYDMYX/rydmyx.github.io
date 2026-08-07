@@ -1,5 +1,5 @@
-const CORE_CACHE = "tules-core-v4";
-const SAMPLE_CACHE = "tules-samples-v4";
+const CORE_CACHE = "tules-core-v5";
+const SAMPLE_CACHE = "tules-samples-v5";
 
 /* Core files needed for the app shell */
 const CORE_FILES = [
