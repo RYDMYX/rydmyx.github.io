@@ -97,7 +97,7 @@ function getExtendedMap(){
     "6": 8,    // G#4
     "7": 10,   // A#4
     "9": 13,   // C#5
-    "0": 15    // D#5
+    "0": 15,    // D#5
     "+": 18    // F#5
 
   };
@@ -152,7 +152,7 @@ function getNoteFromDegree(degree){
 
   const total = keyIndex + degree;
 
-  const noteIndex = total % 12;
+  const noteIndex = ((total % 12) + 12) % 12;
 
   const octaveShift = Math.floor(total / 12);
 
