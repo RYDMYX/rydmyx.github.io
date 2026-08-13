@@ -85,9 +85,9 @@ function getExtendedMap(){
     "i": 24,
     "o": 26,
     "p": 28,
-    "{": 24,
-    "}": 26,
-    "|": 28,
+    "[": 29,
+    "}": 31,
+    "|": 33,
 
 
     // Upper octave - Black keys
