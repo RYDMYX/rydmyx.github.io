@@ -1,1 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
 
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+    <title>Sliding Puzzle</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+
+            display: flex;
+            flex-direction: column;
+
+            align-items: center;
+            justify-content: center;
+
+            gap: 16px;
+
+            background: #111;
+            color: white;
+
+            font-family: Arial, sans-serif;
+
+            user-select: none;
+        }
+
+
+        /* ---------------------------------------------
+           PUZZLE
+        --------------------------------------------- */
+
+        #puzzle {
+            display: block;
+            touch-action: none;
+        }
+
+
+        /* ---------------------------------------------
+           INFO
+        --------------------------------------------- */
+
+        #info {
+            font-size: 18px;
+        }
+
+
+        /* ---------------------------------------------
+           CONTROLS
+        --------------------------------------------- */
+
+        #controls {
+            display: flex;
+
+            gap: 8px;
+
+            justify-content: center;
+            align-items: center;
+        }
+
+
+        button,
+        .file-button {
+            width: 48px;
+            height: 48px;
+
+            padding: 0;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            font-size: 22px;
+
+            cursor: pointer;
+
+            background: #333;
+            color: white;
+
+            border: 1px solid #666;
+
+            border-radius: 6px;
+        }
+
+
+        button:active,
+        .file-button:active {
+            background: #444;
+        }
+
+
+        .file-button input {
+            display: none;
+        }
+
+
+        /* ---------------------------------------------
+           IMPORT MENU
+        --------------------------------------------- */
+
+        /* ---------------------------------------------
+   IMPORT MENU
+--------------------------------------------- */
+
+#importMenu {
+
+    display: none;
+
+    position: fixed;
+
+    z-index: 500;
+
+    background: #222;
+
+    border: 1px solid #666;
+
+    border-radius: 8px;
+
+    padding: 4px;
+
+    gap: 4px;
+
+    flex-direction: row;
+
+    box-shadow:
+        0 6px 20px rgba(0, 0, 0, 0.5);
+}
+
+
+#importMenu button,
+#importMenu label {
+
+    width: 48px;
+    height: 48px;
+
+    padding: 0;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    background: #333;
+
+    color: white;
+
+    border: 0;
+
+    border-radius: 6px;
+
+    font-size: 22px;
+
+    cursor: pointer;
+}
+
+
+#importMenu button:hover,
+#importMenu label:hover {
+
+    background: #444;
+}
+
+
+#importMenu input {
+    display: none;
+}
+
+
+        /* ---------------------------------------------
+           CAMERA
+        --------------------------------------------- */
+
+        #cameraView {
+
+            display: none;
+
+            position: fixed;
+
+            inset: 0;
+
+            background: black;
+
+            z-index: 1000;
+
+            align-items: center;
+            justify-content: center;
+
+            overflow: hidden;
+        }
+
+
+        #cameraVideo {
+
+            position: absolute;
+
+            width: 100%;
+            height: 100%;
+
+            object-fit: cover;
+        }
+
+
+        /* ---------------------------------------------
+           CAMERA GUIDE
+        --------------------------------------------- */
+
+        #cameraGuide {
+
+            position: absolute;
+
+            width: min(85vw, 85vh);
+            height: min(85vw, 85vh);
+
+            border: 2px solid white;
+
+            box-shadow:
+                0 0 0 9999px rgba(0, 0, 0, 0.65);
+
+            pointer-events: none;
+
+            z-index: 2;
+        }
+
+
+        /* ---------------------------------------------
+           CAMERA CONTROLS
+        --------------------------------------------- */
+
+        #cameraControls {
+
+            position: absolute;
+
+            bottom: 30px;
+
+            left: 0;
+            right: 0;
+
+            display: flex;
+
+            justify-content: center;
+
+            gap: 20px;
+
+            z-index: 3;
+        }
+
+
+        #cameraControls button {
+
+            border-radius: 50%;
+
+            width: 64px;
+            height: 64px;
+
+            padding: 0;
+
+            font-size: 14px;
+        }
+
+
+#takePhoto {
+    width: 68px;
+    height: 68px;
+
+    padding: 0;
+
+    border-radius: 50%;
+
+    background: white;
+
+    border: 4px solid #aaa;
+
+    box-shadow:
+        0 0 0 3px rgba(255, 255, 255, 0.8);
+
+    font-size: 0;
+}
+
+
+        #closeCamera {
+
+            border-radius: 10px;
+
+            width: auto;
+            height: auto;
+
+            padding: 10px 18px;
+        }
+
+
+        /* ---------------------------------------------
+           CROP
+        --------------------------------------------- */
+
+        #cropView {
+
+            display: none;
+
+            position: fixed;
+
+            inset: 0;
+
+            background: black;
+
+            z-index: 2000;
+
+            align-items: center;
+            justify-content: center;
+
+            overflow: hidden;
+        }
+
+
+        #cropCanvas {
+
+            position: absolute;
+
+            inset: 0;
+
+            width: 100%;
+            height: 100%;
+
+            touch-action: none;
+        }
+
+
+        #cropControls {
+
+            position: absolute;
+
+            bottom: 30px;
+
+            left: 0;
+            right: 0;
+
+            display: flex;
+
+            justify-content: center;
+
+            gap: 20px;
+
+            z-index: 2;
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+
+    <!-- ---------------------------------------------
+         INFO
+    --------------------------------------------- -->
+
+    <div id="info">
+        Moves: <span id="moves">0</span>
+    </div>
+
+
+    <!-- ---------------------------------------------
+         PUZZLE
+    --------------------------------------------- -->
+
+    <canvas id="puzzle"></canvas>
+
+
+    <!-- ---------------------------------------------
+         CONTROLS
+    --------------------------------------------- -->
+
+    <div id="controls">
+
+        <!-- Toggle numbers / current image -->
+        <button
+            id="toggle"
+            aria-label="Toggle image"
+        >
+            👁️
+        </button>
+
+
+        <!-- Scramble -->
+        <button
+            id="scramble"
+            aria-label="Scramble"
+        >
+            🔀
+        </button>
+
+
+        <!-- Import -->
+        <button
+            id="importButton"
+            aria-label="Import image"
+        >
+            📁
+        </button>
+
+
+        <!-- Secret -->
+        <button
+            id="secretButton"
+            aria-label="Secret image"
+        >
+            🔒
+        </button>
+
+    </div>
+
+
+    <!-- ---------------------------------------------
+         IMPORT MENU
+    --------------------------------------------- -->
+
+    <div id="importMenu">
+
+    <label
+        aria-label="Gallery"
+        title="Gallery"
+    >
+        🖼️
+
+        <input
+            id="imageInput"
+            type="file"
+            accept="image/*"
+        >
+    </label>
+
+
+    <button
+        id="menuCamera"
+        aria-label="Camera"
+        title="Camera"
+    >
+        📷
+    </button>
+
+</div>
+
+
+    <!-- ---------------------------------------------
+         CAMERA
+    --------------------------------------------- -->
+
+    <div id="cameraView">
+
+        <video
+            id="cameraVideo"
+            autoplay
+            playsinline
+        ></video>
+
+
+        <div id="cameraGuide"></div>
+
+
+        <div id="cameraControls">
+
+            <button id="closeCamera">
+                ✕
+            </button>
+
+
+<button id="takePhoto" aria-label="Take photo"></button>
+
+        </div>
+
+    </div>
+
+
+    <!-- ---------------------------------------------
+         IMAGE CROP
+    --------------------------------------------- -->
+
+    <div id="cropView">
+
+        <canvas id="cropCanvas"></canvas>
+
+
+        <div id="cropControls">
+
+            <button id="cropCancel">
+                ✕
+            </button>
+
+
+            <button id="cropUse">
+                ✓
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <script src="puzzle.js"></script>
+
+</body>
+</html>
